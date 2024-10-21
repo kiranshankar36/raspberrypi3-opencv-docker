@@ -1,7 +1,12 @@
 FROM resin/raspberrypi3-python:2.7
 
 # Install Debian repositories
-RUN printf "deb http://archive.debian.org/debian/ jessie main\ndeb-src http://archive.debian.org/debian/ jessie main\ndeb http://security.debian.org jessie/updates main\ndeb-src http://security.debian.org jessie/updates main" > /etc/apt/sources.list
+RUN tee /etc/apt/sources.list <<EOF
+deb http://archive.debian.org/debian/ jessie main
+deb-src http://archive.debian.org/debian/ jessie main
+deb http://security.debian.org jessie/updates main
+deb-src http://security.debian.org jessie/updates main
+EOF
 
 # Install dependencies needed for building and running OpenCV
 RUN apt-get update && apt-get install -y --no-install-recommends \
