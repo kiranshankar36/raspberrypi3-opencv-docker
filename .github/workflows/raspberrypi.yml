@@ -54,9 +54,10 @@ jobs:
           --file opencv_3/3.1.0/Dockerfile \  # Path to Dockerfile
           --tag raspberrypi3-opencv:${{ matrix.opencv_version }} \
           --load \
-          opencv_3/3.1.0  # Build context (folder containing Dockerfile)
+          opencv_3/3.1.0  # Build context (the folder containing the Dockerfile and script)
 
     - name: Save Cache
       if: always()
       run: |
         mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
