@@ -1,24 +1,25 @@
 FROM resin/raspberrypi3-python:2.7
 
-# Install Debian repositories
-RUN tee /etc/apt/sources.list <<EOF
-deb http://archive.debian.org/debian/ jessie main
-deb-src http://archive.debian.org/debian/ jessie main
-deb http://security.debian.org jessie/updates main
-deb-src http://security.debian.org jessie/updates main
-EOF
+RUN cwd=$(pwd)
+
+# https://superuser.com/questions/1423486/issue-with-fetching-http-deb-debian-org-debian-dists-jessie-updates-inrelease
+RUN printf "deb http://archive.debian.org/debian/ jessie main\ndeb-src http://archive.debian.org/debian/ jessie main\ndeb http://security.debian.org jessie/updates main\ndeb-src http://security.debian.org jessie/updates main" > /etc/apt/sources.list
 
 # Install dependencies needed for building and running OpenCV
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    # to build and install
     unzip \
     build-essential cmake pkg-config \
     checkinstall yasm \
+    # to work with images
     libjpeg-dev libtiff-dev libjasper-dev libpng12-dev libtiff5-dev \
+    # to work with videos
     libavcodec-dev libavformat-dev libswscale-dev \
     libxine2-dev libv4l-dev
 
-# Create symlink for compatibility
-RUN ln -s -f /usr/include/libv4l1-videodev.h /usr/include/linux/videodev.h
+RUN cd /usr/include/linux && \
+    sudo ln -s -f ../libv4l1-videodev.h videodev.h && \
+    cd $cwd
 
 RUN apt-get install -y --no-install-recommends \
     libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev \
@@ -37,20 +38,20 @@ RUN apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get -y autoremove
 
-# Install Python packages
+# Install python packages
 RUN pip install --no-cache-dir \
     # OpenCV dependency
     numpy \
-    # other useful stuff
+    # other usefull stuff
     ipython \
     # cleanup
     && find /usr/local \
        \( -type d -a -name test -o -name tests \) \
        -o \( -type f -a -name '*.pyc' -o -name '*.pyo' \) \
        -exec rm -rf '{}' + \
+    && cd / \
     && rm -rf /usr/src/python ~/.cache
 
 # Install OpenCV
 COPY download_build_install_opencv.sh download_build_install_opencv.sh
-RUN chmod +x download_build_install_opencv.sh
 RUN ./download_build_install_opencv.sh
