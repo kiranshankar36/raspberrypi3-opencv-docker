@@ -17,9 +17,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libavcodec-dev libavformat-dev libswscale-dev \
     libxine2-dev libv4l-dev
 
-RUN cd /usr/include/linux && \
-    sudo ln -s -f ../libv4l1-videodev.h videodev.h && \
-    cd $cwd
+# RUN cd /usr/include/linux && \
+#     sudo ln -s -f ../libv4l1-videodev.h videodev.h && \
+#     cd $cwd
 
 RUN apt-get install -y --no-install-recommends \
     libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev \
